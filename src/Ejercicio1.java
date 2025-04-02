@@ -1,7 +1,7 @@
 import java.io.File;
 import java.util.Scanner;
 
-public class Main {
+public class Ejercicio1 {
     public static void main(String[] args) {
         File directorioActual = File.listRoots()[0];
         int opcionSeleccionada;
@@ -41,14 +41,10 @@ public class Main {
             s.nextLine();
 
             if (opcionSeleccionada == 0) {
-                if (padre != null && padre.canRead()) {
-                    directorioActual = padre;
-                }
+                if (padre != null && padre.canRead()) directorioActual = padre;
             } else if (opcionSeleccionada > 0 && contenido != null && opcionSeleccionada <= contenido.length) {
                 File seleccionado = contenido[opcionSeleccionada - 1];
-                if (seleccionado.isDirectory() && seleccionado.canRead()) {
-                    directorioActual = seleccionado;
-                }
+                if (seleccionado.isDirectory() && seleccionado.canRead()) directorioActual = seleccionado;
             } else if (opcionSeleccionada == -1) System.out.println("Saliendo...");
             else System.out.println("Opción no válida");
 
