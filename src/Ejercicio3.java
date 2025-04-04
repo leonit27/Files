@@ -53,85 +53,33 @@ public class Ejercicio3 {
                 }
             }
 
-            //Manejamos las ociones seleccionadas
-            if (opcionSeleccionada != -2) {
-                System.out.print("Opciones:\n-1 para salir\n-2 para cambiar permisos\n-3 para contar archivos por extensión\n" +
-                        "-4 Buscar archivo por nombre\n-5 Crear un nuevo directorio\n-6 Eliminar un directorio\nIntroduce una opción: ");
-                opcionSeleccionada = s.nextInt();
-                s.nextLine();
+            //Mostramos opciones y recogemos la selección
+            System.out.print("Opciones:\n-1 para salir\n-2 para cambiar permisos\n-3 para contar archivos por extensión\n" +
+                    "-4 Buscar archivo por nombre\n-5 Crear un nuevo directorio\n-6 Eliminar un directorio\nIntroduce una opción: ");
+            opcionSeleccionada = s.nextInt();
+            s.nextLine();
 
-                if (opcionSeleccionada == 0) {
-                    if (padre != null && padre.canRead()) directorioActual = padre;
-                } else if (opcionSeleccionada > 0 && contenido != null && opcionSeleccionada <= contenido.length) {
-                    File seleccionado = contenido[opcionSeleccionada - 1];
-                    if (seleccionado.isDirectory() && seleccionado.canRead()) directorioActual = seleccionado;
-                } else if (opcionSeleccionada == -1) System.out.println("Saliendo...");
-                else if (opcionSeleccionada == -3) {
-                    int contadorExtension = 0;
-
-                    System.out.print("Ingrese la extensión a buscar (ej: txt, java): ");
-                    String extension = s.nextLine();
-
-                    for (int i = 0; i < contenido.length; i++) {
-                        if (contenido[i].getName().endsWith(extension)) contadorExtension++;
-                    }
-
-                    System.out.printf("Se encontraron %d archivos con la extension .%s\n", contadorExtension, extension);
-                    opcionSeleccionada = 0;
-                } else if (opcionSeleccionada == -4) {
-                    System.out.print("Ingrese el nombre del archivo a buscar: ");
-                    String nombreArchivo = s.nextLine();
-
-                    for (int i = 0; i < contenido.length; i++) {
-                        if (contenido[i].getName().equals(nombreArchivo) && contenido[i].exists()) System.out.println("Archivo encontrado: " + contenido[i].getAbsolutePath());
-                    }
-
-                    opcionSeleccionada = 0;
-                } else if (opcionSeleccionada == -5) {
-                    System.out.print("Introduce el nombre del nuevo directorio: ");
-                    String nuevoDirectorio = s.nextLine();
-
-                    File fileNuevoDirectorio = new File(directorioActual, nuevoDirectorio);
-
-                    fileNuevoDirectorio.mkdir();
-                    opcionSeleccionada = 0;
-                } else if (opcionSeleccionada == -6) {
-                    System.out.print("Qué directorio deseas eliminar?: ");
-                    String directorioElimiado = s.nextLine();
-
-                    File fileDirectorioEliminado = new File(directorioActual, directorioElimiado);
-
-                    if (fileDirectorioEliminado.exists() && fileDirectorioEliminado.isDirectory()) fileDirectorioEliminado.delete();
-                    else System.out.println("El directorio no existe.");
-
-                    opcionSeleccionada = 0;
-                }
-            } else {
-                System.out.print("Introduce el número del archivo que deseas cambiar los permisos: ");
-                int permisos = s.nextInt();
-                s.nextLine();
-
-                //Modificamos los archivos de lectura
-                System.out.print("Deseas darle permisos de lectura (D) o quitarselos (Q)?: ");
-                String darOQuitarLectura = s.nextLine();
-
-                if (darOQuitarLectura.equals("D")) contenido[permisos - 1].setReadable(true, false);
-                else contenido[permisos - 1].setReadable(false, false);
-
-                //Modificamos los archivos de lectura
-                System.out.print("Deseas darle permisos de escritura (D) o quitarselos (Q)?: ");
-                String darOQuitarEscritura = s.nextLine();
-
-                if (darOQuitarEscritura.equals("D")) contenido[permisos - 1].setWritable(true, false);
-                else contenido[permisos - 1].setWritable(false, false);
-
-                //Modificamos los archivos de lectura
-                System.out.print("Deseas darle permisos de ejecución (D) o quitarselos (Q)?: ");
-                String darOQuitarEjecucion = s.nextLine();
-
-                if (darOQuitarEjecucion.equals("D")) contenido[permisos - 1].setExecutable(true, false);
-                else contenido[permisos - 1].setExecutable(false, false);
-
+            if (opcionSeleccionada == 0) {
+                if (padre != null && padre.canRead()) directorioActual = padre;
+            } else if (opcionSeleccionada > 0 && contenido != null && opcionSeleccionada <= contenido.length) {
+                File seleccionado = contenido[opcionSeleccionada - 1];
+                if (seleccionado.isDirectory() && seleccionado.canRead()) directorioActual = seleccionado;
+            } else if (opcionSeleccionada == -1) {
+                System.out.println("Saliendo...");
+            } else if (opcionSeleccionada == -2) {
+                cambiarPermisos(contenido, s);
+                opcionSeleccionada = 0;
+            } else if (opcionSeleccionada == -3) {
+                contarArchivosPorExtension(contenido, s);
+                opcionSeleccionada = 0;
+            } else if (opcionSeleccionada == -4) {
+                buscarArchivoPorNombre(contenido, s);
+                opcionSeleccionada = 0;
+            } else if (opcionSeleccionada == -5) {
+                crearNuevoDirectorio(directorioActual, s);
+                opcionSeleccionada = 0;
+            } else if (opcionSeleccionada == -6) {
+                eliminarDirectorio(directorioActual, s);
                 opcionSeleccionada = 0;
             }
 
@@ -139,5 +87,74 @@ public class Ejercicio3 {
 
         s.close();
         System.out.println("Programa finalizado.");
+    }
+
+    private static void cambiarPermisos(File[] contenido, Scanner s) {
+        System.out.print("Introduce el número del archivo que deseas cambiar los permisos: ");
+        int permisos = s.nextInt();
+        s.nextLine();
+
+        //Modificamos los archivos de lectura
+        System.out.print("Deseas darle permisos de lectura (D) o quitarselos (Q)?: ");
+        String darOQuitarLectura = s.nextLine();
+
+        if (darOQuitarLectura.equals("D")) contenido[permisos - 1].setReadable(true, false);
+        else contenido[permisos - 1].setReadable(false, false);
+
+        //Modificamos los archivos de lectura
+        System.out.print("Deseas darle permisos de escritura (D) o quitarselos (Q)?: ");
+        String darOQuitarEscritura = s.nextLine();
+
+        if (darOQuitarEscritura.equals("D")) contenido[permisos - 1].setWritable(true, false);
+        else contenido[permisos - 1].setWritable(false, false);
+
+        //Modificamos los archivos de lectura
+        System.out.print("Deseas darle permisos de ejecución (D) o quitarselos (Q)?: ");
+        String darOQuitarEjecucion = s.nextLine();
+
+        if (darOQuitarEjecucion.equals("D")) contenido[permisos - 1].setExecutable(true, false);
+        else contenido[permisos - 1].setExecutable(false, false);
+    }
+
+    private static void contarArchivosPorExtension(File[] contenido, Scanner s) {
+        int contadorExtension = 0;
+
+        System.out.print("Ingrese la extensión a buscar (ej: txt, java): ");
+        String extension = s.nextLine();
+
+        for (int i = 0; i < contenido.length; i++) {
+            if (contenido[i].getName().endsWith(extension)) contadorExtension++;
+        }
+
+        System.out.printf("Se encontraron %d archivos con la extension .%s\n", contadorExtension, extension);
+    }
+
+    private static void buscarArchivoPorNombre(File[] contenido, Scanner s) {
+        System.out.print("Ingrese el nombre del archivo a buscar: ");
+        String nombreArchivo = s.nextLine();
+
+        for (int i = 0; i < contenido.length; i++) {
+            if (contenido[i].getName().equals(nombreArchivo) && contenido[i].exists())
+                System.out.println("Archivo encontrado: " + contenido[i].getAbsolutePath());
+        }
+    }
+
+    private static void crearNuevoDirectorio(File directorioActual, Scanner s) {
+        System.out.print("Introduce el nombre del nuevo directorio: ");
+        String nuevoDirectorio = s.nextLine();
+
+        File fileNuevoDirectorio = new File(directorioActual, nuevoDirectorio);
+
+        fileNuevoDirectorio.mkdir();
+    }
+
+    private static void eliminarDirectorio(File directorioActual, Scanner s) {
+        System.out.print("Qué directorio deseas eliminar?: ");
+        String directorioElimiado = s.nextLine();
+
+        File fileDirectorioEliminado = new File(directorioActual, directorioElimiado);
+
+        if (fileDirectorioEliminado.exists() && fileDirectorioEliminado.isDirectory()) fileDirectorioEliminado.delete();
+        else System.out.println("El directorio no existe.");
     }
 }
